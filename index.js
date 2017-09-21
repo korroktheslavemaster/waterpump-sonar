@@ -12,6 +12,8 @@ var Point = require('./point.js')
 app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
 
+app.set('view engine', 'ejs') 
+
 app.get('/', function (req, res) {
   res.send('Hello World!')
 })
@@ -28,8 +30,15 @@ app.get('/data', function(req, res) {
   })
 })
 
+var moment = require('moment-timezone')
 app.get('/plot', (req, res) => {
-  res.send("in progress")
+  // timezones not supported by plotly, change it manually here
+  Point.find().sort({timestamp: -1}).limit(100)
+    .then(points => {
+      x = points.map(pt => moment.tz(pt['timestamp'], 'Asia/Kolkata').format())
+      y = points.map(pt => pt['distance'])
+      res.render('plot', {x: JSON.stringify(x), y: JSON.stringify(y)})
+    })
 })
 
 port = process.env.PORT || 3000
