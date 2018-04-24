@@ -21,8 +21,7 @@ app.get("/", function(req, res) {
 app.get("/data", function(req, res) {
   new Point({
     timestamp: new Date(),
-    distance: parseFloat(req.query.distance),
-    percentage: parseFloat(req.query.percentage)
+    distance: parseFloat(req.query.distance)
   })
     .save()
     .then(() => {
@@ -44,10 +43,7 @@ app.get("/plot", (req, res) => {
       x = points.map(({ timestamp }) =>
         moment.tz(timestamp, "Asia/Kolkata").format()
       );
-      y = points.map(
-        ({ distance, percentage }) =>
-          percentage ? percentage : (TANK_DEPTH_CM - distance) / TANK_DEPTH_CM
-      );
+      y = points.map(({ percentage }) => percentage);
       res.render("plot", { x: JSON.stringify(x), y: JSON.stringify(y) });
     });
 });
