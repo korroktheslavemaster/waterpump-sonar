@@ -13,16 +13,13 @@ const baseStyles = {
 // const RASPI_URL = "http://172.18.224.182";
 const RASPI_URL = "http://waterpumpserverarpit.serveo.net";
 
-class App extends Component {
+class OtherStuff extends Component {
   state = {
-    latestPoint: null,
-    motor: "-",
+    motor: "...",
     loading: false
   };
+
   componentDidMount() {
-    fetch(`/api/point/latest`)
-      .then(res => res.json())
-      .then(latestPoint => this.setState({ latestPoint }));
     fetch(`${RASPI_URL}/motor`)
       .then(res => res.json())
       .then(({ motor }) => this.setState({ motor: motor ? "ON" : "OFF" }));
@@ -38,9 +35,47 @@ class App extends Component {
   };
 
   render() {
-    const { latestPoint, motor, loading } = this.state;
+    const { motor, loading } = this.state;
     return (
       <div className="container">
+        <div className="row">
+          <div className="sixteen columns" style={baseStyles}>
+            <h2>Motor is {motor}</h2>
+          </div>
+        </div>
+        <div className="row">
+          <div className="sixteen columns" style={baseStyles}>
+            <button
+              disabled={(motor == "..." ? true : false) || loading}
+              onClick={this.onMotorClicked}
+            >
+              Turn {motor == "ON" ? "OFF" : "ON"}
+            </button>
+          </div>
+        </div>
+        <div className="row">
+          <div className="sixteen columns" style={baseStyles}>
+            {loading ? <ScaleLoader color="#5b5b5b" /> : ""}
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+class App extends Component {
+  state = {
+    latestPoint: null
+  };
+  componentDidMount() {
+    fetch(`/api/point/latest`)
+      .then(res => res.json())
+      .then(latestPoint => this.setState({ latestPoint }));
+  }
+  render() {
+    const { latestPoint } = this.state;
+    return (
+      <div className="container" style={{ paddingTop: "1.5rem" }}>
         <div className="row">
           <h1 style={baseStyles} className="sixteen columns">
             Tank Level
@@ -54,26 +89,8 @@ class App extends Component {
             <i>{latestPoint ? moment(latestPoint.timestamp).fromNow() : "-"}</i>
           </small>
         </div>
-        <div className="row">
-          <div className="sixteen columns" style={baseStyles}>
-            <h2>Motor is {motor}</h2>
-          </div>
-        </div>
-        <div className="row">
-          <div className="sixteen columns" style={baseStyles}>
-            <button
-              disabled={(motor == "-" ? true : false) || loading}
-              onClick={this.onMotorClicked}
-            >
-              Turn {motor == "ON" ? "OFF" : "ON"}
-            </button>
-          </div>
-        </div>
-        <div className="row">
-          <div className="sixteen columns" style={baseStyles}>
-            {loading ? <ScaleLoader color="#5b5b5b" /> : ""}
-          </div>
-        </div>
+        {/*  seperated this because gauge was bugging out if other fetch was included here...*/}
+        <OtherStuff />
       </div>
     );
   }
