@@ -38,10 +38,14 @@ class OtherStuff extends Component {
   };
 
   onRefreshClicked = () => {
+    const { onLatestPointChanged } = this.props;
     this.setState({ loading: true });
     fetch(`${RASPI_URL}/motor`)
       .then(res => res.json())
       .then(({ motor }) => this.setState({ motor, loading: false }));
+    fetch(`/api/point/latest`)
+      .then(res => res.json())
+      .then(latestPoint => onLatestPointChanged(latestPoint));
   };
 
   render() {
@@ -118,7 +122,9 @@ class App extends Component {
           </small>
         </div>
         {/*  seperated this because gauge was bugging out if other fetch was included here...*/}
-        <OtherStuff />
+        <OtherStuff
+          onLatestPointChanged={latestPoint => this.setState({ latestPoint })}
+        />
       </div>
     );
   }
