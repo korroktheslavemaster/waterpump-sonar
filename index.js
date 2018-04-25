@@ -1,6 +1,7 @@
 if (process.env.NODE_ENV != "production") {
   require("dotenv").config();
 }
+var moment = require("moment");
 var express = require("express");
 var app = express();
 var mongoose = require("mongoose");
@@ -40,12 +41,20 @@ app.get("/api/data", function(req, res) {
 var moment = require("moment-timezone");
 app.get("/api/plot", (req, res) => {
   const TANK_DEPTH_CM = 109.982; // copying value from sonar.py on raspi
-  // timezones not supported by plotly, change it manually here
-  Point.find()
+  // last 24 hours only
+  Point.find({
+    timestamp: {
+      $lte: moment().toDate(),
+      $gte: moment()
+        .subtract(1, "days")
+        .toDate()
+    }
+  })
     .sort({ timestamp: -1 })
-    .limit(300)
+    // .limit(300)
     .then(points => {
       x = points.map(({ timestamp }) =>
+        // timezones not supported by plotly, change it manually here
         moment.tz(timestamp, "Asia/Kolkata").format()
       );
       y = points.map(({ percentage }) => percentage);
