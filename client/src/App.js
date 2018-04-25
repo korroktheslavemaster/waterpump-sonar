@@ -13,9 +13,9 @@ const baseStyles = {
 // raspi WAN:
 // const RASPI_URL = "http://172.18.224.182";
 // serveo:
-// const RASPI_URL = "http://waterpumpserverarpit.serveo.net";
+const RASPI_URL = "http://waterpumpserverarpit.serveo.net";
 // localtunnel:
-const RASPI_URL = "http://waterpumpserver.localtunnel.me";
+// const RASPI_URL = "http://waterpumpserver.localtunnel.me";
 
 class OtherStuff extends Component {
   state = {
