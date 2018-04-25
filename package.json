@@ -5,12 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "buildclient": "cd client && yarn install && npm run build",
+    "postinstall": "npm run buildclient"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.1",
+    "dotenv": "^5.0.1",
     "ejs": "^2.5.7",
     "express": "^4.15.4",
     "moment-timezone": "^0.5.13",

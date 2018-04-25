@@ -1,7 +1,4 @@
 {
   "verbose": true,
-  "ignore": ["*.test.js", "fixtures/*", "view/", "public/"],
-  "env": {
-    "PORT": 3000
-  }
+  "ignore": ["*.test.js", "fixtures/*", "view/", "public/"]
 }
