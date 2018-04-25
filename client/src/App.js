@@ -97,15 +97,39 @@ class OtherStuff extends Component {
 
 class App extends Component {
   state = {
-    latestPoint: null
+    latestPoint: null,
+    latestPointTimeString: "-"
   };
+
   componentDidMount() {
     fetch(`/api/point/latest`)
       .then(res => res.json())
-      .then(latestPoint => this.setState({ latestPoint }));
+      .then(latestPoint =>
+        this.setState({
+          latestPoint,
+          latestPointTimeString: this.latestPointTimeString(latestPoint)
+        })
+      );
+    this.interval = setInterval(() => {
+      this.setState({
+        latestPointTimeString: this.latestPointTimeString(
+          this.state.latestPoint
+        )
+      });
+    }, 10000);
   }
+
+  componentWillUnmount() {
+    // remove the interval listener
+    clearInterval(this.interval);
+  }
+
+  latestPointTimeString = latestPoint => {
+    return latestPoint ? moment(latestPoint.timestamp).fromNow() : "-";
+  };
+
   render() {
-    const { latestPoint } = this.state;
+    const { latestPoint, latestPointTimeString } = this.state;
     return (
       <div className="container" style={{ paddingTop: "1.5rem" }}>
         <div className="row">
@@ -118,12 +142,16 @@ class App extends Component {
         </div>
         <div className="row">
           <small className="sixteen columns" style={baseStyles}>
-            <i>{latestPoint ? moment(latestPoint.timestamp).fromNow() : "-"}</i>
+            <i>{latestPointTimeString}</i>
           </small>
         </div>
         {/*  seperated this because gauge was bugging out if other fetch was included here...*/}
         <OtherStuff
-          onLatestPointChanged={latestPoint => this.setState({ latestPoint })}
+          onLatestPointChanged={latestPoint =>
+            this.setState({
+              latestPoint,
+              latestPointTimeString: this.latestPointTimeString(latestPoint)
+            })}
         />
       </div>
     );
