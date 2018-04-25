@@ -10,7 +10,8 @@ const baseStyles = {
   textAlign: "center"
 };
 // hardcoding raspi url here
-const RASPI_URL = "http://172.18.224.182";
+// const RASPI_URL = "http://172.18.224.182";
+const RASPI_URL = "http://waterpumpserverarpit.serveo.net";
 
 class App extends Component {
   state = {
