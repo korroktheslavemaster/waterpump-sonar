@@ -19,41 +19,65 @@ const RASPI_URL = "http://waterpumpserver.localtunnel.me";
 
 class OtherStuff extends Component {
   state = {
-    motor: "...",
+    motor: undefined,
     loading: false
   };
 
   componentDidMount() {
     fetch(`${RASPI_URL}/motor`)
       .then(res => res.json())
-      .then(({ motor }) => this.setState({ motor: motor ? "ON" : "OFF" }));
+      .then(({ motor }) => this.setState({ motor }));
   }
 
   onMotorClicked = () => {
+    const { motor } = this.state;
     this.setState({ loading: true });
-    fetch(`${RASPI_URL}/motor/switch`)
+    fetch(`${RASPI_URL}/motor/switch/${motor ? "off" : "on"}`)
       .then(res => res.json())
-      .then(({ motor }) =>
-        this.setState({ motor: motor ? "ON" : "OFF", loading: false })
-      );
+      .then(({ motor }) => this.setState({ motor, loading: false }));
+  };
+
+  onRefreshClicked = () => {
+    this.setState({ loading: true });
+    fetch(`${RASPI_URL}/motor`)
+      .then(res => res.json())
+      .then(({ motor }) => this.setState({ motor, loading: false }));
   };
 
   render() {
     const { motor, loading } = this.state;
+    var motorString = motor == undefined ? "..." : motor ? "ON" : "OFF";
     return (
       <div className="container">
         <div className="row">
           <div className="sixteen columns" style={baseStyles}>
-            <h2>Motor is {motor}</h2>
+            <h2>
+              Motor is{" "}
+              {motor ? (
+                <span style={{ color: "#48ce58" }}>{motorString}</span>
+              ) : (
+                motorString
+              )}
+            </h2>
           </div>
         </div>
         <div className="row">
           <div className="sixteen columns" style={baseStyles}>
             <button
-              disabled={(motor == "..." ? true : false) || loading}
+              disabled={(motor == undefined ? true : false) || loading}
               onClick={this.onMotorClicked}
             >
-              Turn {motor == "ON" ? "OFF" : "ON"}
+              Turn {motor ? "OFF" : "ON"}
+            </button>
+          </div>
+        </div>
+        <div className="row">
+          <div className="sixteen columns" style={baseStyles}>
+            <button
+              disabled={(motor == undefined ? true : false) || loading}
+              onClick={this.onRefreshClicked}
+            >
+              Refresh
             </button>
           </div>
         </div>
