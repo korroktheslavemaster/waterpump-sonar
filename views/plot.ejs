@@ -12,12 +12,34 @@
     var data = [
       {
         x: <%-x%>,
-        y: <%-y%>,
-        type: 'scatter'
+        y: <%-y_percentage%>,
+        type: 'scatter',
+        name: 'percentage'
+      },
+      {
+        x: <%-x%>,
+        y: <%-y_distance%>,
+        type: 'scatter',
+        yaxis: 'y2',
+        name: 'distance'
       }
     ];
 
-    Plotly.newPlot('myDiv', data);
+    var layout = {
+      title: 'Water Tank Level and Distance Plot',
+      yaxis: {title: 'percentage'},
+      yaxis2: {
+        title: 'distance',
+        titlefont: {color: 'rgb(148, 103, 189)'},
+        tickfont: {color: 'rgb(148, 103, 189)'},
+        overlaying: 'y',
+        side: 'right'
+      }
+    };
+
+   
+
+    Plotly.newPlot('myDiv', data, layout);
   </script>
 </body>
 </html>

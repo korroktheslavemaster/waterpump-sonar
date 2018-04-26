@@ -57,8 +57,13 @@ app.get("/api/plot", (req, res) => {
         // timezones not supported by plotly, change it manually here
         moment.tz(timestamp, "Asia/Kolkata").format()
       );
-      y = points.map(({ percentage }) => percentage);
-      res.render("plot", { x: JSON.stringify(x), y: JSON.stringify(y) });
+      y_percentage = points.map(({ percentage }) => percentage);
+      y_distance = points.map(({ distance }) => distance);
+      res.render("plot", {
+        x: JSON.stringify(x),
+        y_percentage: JSON.stringify(y_percentage),
+        y_distance: JSON.stringify(y_distance)
+      });
     });
 });
 
