@@ -4,7 +4,8 @@ var mongoose = require("mongoose");
 var schema = mongoose.Schema(
   {
     timestamp: { type: Date, required: true },
-    distance: { type: Number, required: true }
+    distance: { type: Number, required: true },
+    motor: Number
   },
   {
     toObject: {
