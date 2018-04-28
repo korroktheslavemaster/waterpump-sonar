@@ -4,15 +4,43 @@ if (process.env.NODE_ENV != "production") {
 var moment = require("moment");
 var express = require("express");
 var app = express();
+
+const http = require("http");
+const url = require("url");
+const WebSocket = require("ws");
+
 var mongoose = require("mongoose");
 var bodyParser = require("body-parser");
 const path = require("path");
 
-var url = process.env.MONGODB_URI; // looks like mongodb://<user>:<pass>@mongo.onmodulus.net:27017/Mikha4ot
-var connection = mongoose.connect(url); // connect to our database
+var mongoUrl = process.env.MONGODB_URI; // looks like mongodb://<user>:<pass>@mongo.onmodulus.net:27017/Mikha4ot
+var connection = mongoose.connect(mongoUrl); // connect to our database
 mongoose.Promise = global.Promise;
-
 var Point = require("./point.js");
+
+var mqtt = require("mqtt");
+var mqtt_client = mqtt.connect(process.env.MQTT_URL);
+
+mqtt_client.on("connect", function() {
+  mqtt_client.subscribe(process.env.STATUS_TOPIC);
+  console.log("connected");
+});
+
+var numMessages = 0;
+
+mqtt_client.on("message", function(topic, message) {
+  // message is Buffer
+  // console.log(message.toString());
+  if (topic == process.env.STATUS_TOPIC) {
+    numMessages += 1;
+    // store every 6th message ~ every 30 seconds
+    if (numMessages % 6 == 0) {
+      var point = JSON.parse(message.toString());
+      point.timestamp = new Date(point.timestamp * 1000);
+      new Point(point).save().then(point => console.log(point));
+    }
+  }
+});
 
 app.use(bodyParser.urlencoded());
 app.use(bodyParser.json());
@@ -24,19 +52,21 @@ app.set("view engine", "ejs");
 // });
 
 // API
-app.get("/api/data", function(req, res) {
-  new Point({
-    timestamp: new Date(),
-    distance: parseFloat(req.query.distance)
-  })
-    .save()
-    .then(() => {
-      res.send("OK");
-    })
-    .catch(() => {
-      res.send("NOT OK");
-    });
-});
+
+// DEPRECATED
+// app.get("/api/data", function(req, res) {
+//   new Point({
+//     timestamp: new Date(),
+//     distance: parseFloat(req.query.distance)
+//   })
+//     .save()
+//     .then(() => {
+//       res.send("OK");
+//     })
+//     .catch(() => {
+//       res.send("NOT OK");
+//     });
+// });
 
 var moment = require("moment-timezone");
 app.get("/api/plot", (req, res) => {
@@ -95,6 +125,35 @@ if (process.env.NODE_ENV == "production") {
 }
 
 port = process.env.PORT;
-app.listen(port, function() {
+
+// websocket
+
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+wss.on("connection", function connection(ws, req) {
+  const location = url.parse(req.url, true);
+  // You might use location.query.access_token to authenticate or share sessions
+  // or req.headers.cookie (see http://stackoverflow.com/a/16395220/151312)
+
+  ws.on("message", function incoming(message) {
+    console.log("received: %s", message);
+  });
+
+  ws.send("something");
+
+  var id = setInterval(function() {
+    ws.send(JSON.stringify(new Date()), function() {});
+  }, 1000);
+
+  console.log("websocket connection open");
+
+  ws.on("close", function() {
+    console.log("websocket connection close");
+    clearInterval(id);
+  });
+});
+
+server.listen(port, function() {
   console.log("Example app listening on port " + port);
 });

@@ -18,6 +18,8 @@
     "express": "^4.15.4",
     "moment": "^2.22.1",
     "moment-timezone": "^0.5.13",
-    "mongoose": "^4.11.12"
+    "mongoose": "^4.11.12",
+    "mqtt": "^2.17.0",
+    "ws": "^5.1.1"
   }
 }

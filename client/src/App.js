@@ -4,55 +4,84 @@ import "./App.css";
 import Gauge from "./Gauge";
 import moment from "moment";
 import { ScaleLoader } from "react-spinners";
+import mqtt from "mqtt";
 
 const baseStyles = {
   padding: "0.5rem",
   textAlign: "center"
 };
-// hardcoding raspi url here
-// raspi WAN:
-// const RASPI_URL = "http://172.18.224.182";
-// serveo:
-const RASPI_URL = "http://waterpumpserverarpit.serveo.net";
-// localtunnel:
-// const RASPI_URL = "http://waterpumpserver.localtunnel.me";
 
-class OtherStuff extends Component {
+class App extends Component {
   state = {
-    motor: undefined,
-    loading: false
+    latestPoint: null,
+    loading: true
+  };
+
+  onMotorClicked = () => {
+    const { client, latestPoint: { motor } } = this.state;
+    client.publish("arpit/waterpump/motor", motor ? "0" : "1");
+    this.setState({ loading: true });
   };
 
   componentDidMount() {
-    fetch(`${RASPI_URL}/motor`)
-      .then(res => res.json())
-      .then(({ motor }) => this.setState({ motor }));
-  }
-
-  onMotorClicked = () => {
-    const { motor } = this.state;
-    this.setState({ loading: true });
-    fetch(`${RASPI_URL}/motor/switch/${motor ? "off" : "on"}`)
-      .then(res => res.json())
-      .then(({ motor }) => this.setState({ motor, loading: false }));
-  };
-
-  onRefreshClicked = () => {
-    const { onLatestPointChanged } = this.props;
-    this.setState({ loading: true });
-    fetch(`${RASPI_URL}/motor`)
-      .then(res => res.json())
-      .then(({ motor }) => this.setState({ motor, loading: false }));
+    // fetch first point from server only
     fetch(`/api/point/latest`)
       .then(res => res.json())
-      .then(latestPoint => onLatestPointChanged(latestPoint));
+      .then(latestPoint => ({
+        ...latestPoint,
+        timestamp: moment(latestPoint.timestamp).unix()
+      }))
+      .then(latestPoint => this.setState({ latestPoint }));
+    var client = mqtt.connect(
+      "wss://test.mosquitto.org:8081/" /*, {
+      username: "qfpvofcn",
+      password: "FdC_CFb_idiV"
+    }*/
+    );
+    client.on("connect", function() {
+      console.log("connected");
+      client.subscribe("arpit/waterpump/status");
+    });
+
+    client.on("message", (topic, message) => {
+      // message is Buffer
+      if (topic == "arpit/waterpump/status") {
+        var latestPoint = JSON.parse(message.toString());
+        this.setState({ latestPoint, loading: false });
+      }
+    });
+    this.setState({ client });
+  }
+
+  componentWillUnmount() {
+    console.log("disconnected");
+    this.state.client.end();
+  }
+
+  latestPointTimeString = latestPoint => {
+    return latestPoint ? moment.unix(latestPoint.timestamp).fromNow() : "-";
   };
 
   render() {
-    const { motor, loading } = this.state;
+    const { latestPoint, loading } = this.state;
+    const motor = latestPoint ? latestPoint.motor : undefined;
+    const latestPointTimeString = this.latestPointTimeString(latestPoint);
     var motorString = motor == undefined ? "..." : motor ? "ON" : "OFF";
     return (
-      <div className="container">
+      <div className="container" style={{ paddingTop: "1.5rem" }}>
+        <div className="row">
+          <h1 style={baseStyles} className="sixteen columns">
+            Tank Level
+          </h1>
+        </div>
+        <div className="row">
+          {latestPoint ? <Gauge point={latestPoint} /> : "-"}
+        </div>
+        <div className="row">
+          <small className="sixteen columns" style={baseStyles}>
+            <i>{latestPointTimeString}</i>
+          </small>
+        </div>
         <div className="row">
           <div className="sixteen columns" style={baseStyles}>
             <h2>
@@ -75,84 +104,12 @@ class OtherStuff extends Component {
             </button>
           </div>
         </div>
-        <div className="row">
-          <div className="sixteen columns" style={baseStyles}>
-            <button
-              disabled={(motor == undefined ? true : false) || loading}
-              onClick={this.onRefreshClicked}
-            >
-              Refresh
-            </button>
-          </div>
-        </div>
+
         <div className="row">
           <div className="sixteen columns" style={baseStyles}>
             {loading ? <ScaleLoader color="#5b5b5b" /> : ""}
           </div>
         </div>
-      </div>
-    );
-  }
-}
-
-class App extends Component {
-  state = {
-    latestPoint: null,
-    latestPointTimeString: "-"
-  };
-
-  componentDidMount() {
-    fetch(`/api/point/latest`)
-      .then(res => res.json())
-      .then(latestPoint =>
-        this.setState({
-          latestPoint,
-          latestPointTimeString: this.latestPointTimeString(latestPoint)
-        })
-      );
-    this.interval = setInterval(() => {
-      this.setState({
-        latestPointTimeString: this.latestPointTimeString(
-          this.state.latestPoint
-        )
-      });
-    }, 10000);
-  }
-
-  componentWillUnmount() {
-    // remove the interval listener
-    clearInterval(this.interval);
-  }
-
-  latestPointTimeString = latestPoint => {
-    return latestPoint ? moment(latestPoint.timestamp).fromNow() : "-";
-  };
-
-  render() {
-    const { latestPoint, latestPointTimeString } = this.state;
-    return (
-      <div className="container" style={{ paddingTop: "1.5rem" }}>
-        <div className="row">
-          <h1 style={baseStyles} className="sixteen columns">
-            Tank Level
-          </h1>
-        </div>
-        <div className="row">
-          {latestPoint ? <Gauge point={latestPoint} /> : "-"}
-        </div>
-        <div className="row">
-          <small className="sixteen columns" style={baseStyles}>
-            <i>{latestPointTimeString}</i>
-          </small>
-        </div>
-        {/*  seperated this because gauge was bugging out if other fetch was included here...*/}
-        <OtherStuff
-          onLatestPointChanged={latestPoint =>
-            this.setState({
-              latestPoint,
-              latestPointTimeString: this.latestPointTimeString(latestPoint)
-            })}
-        />
       </div>
     );
   }
