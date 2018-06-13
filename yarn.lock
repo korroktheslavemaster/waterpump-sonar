@@ -23,6 +23,15 @@ async@2.1.4:
   dependencies:
     lodash "^4.14.0"
 
+aws-iot-device-sdk@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/aws-iot-device-sdk/-/aws-iot-device-sdk-2.2.1.tgz#0df7fa8b4c5204d24d8a5f72a12ce43301b09c53"
+  dependencies:
+    crypto-js "3.1.6"
+    minimist "1.2.0"
+    mqtt "2.15.1"
+    websocket-stream "^5.0.1"
+
 balanced-match@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
@@ -94,7 +103,7 @@ concat-map@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
 
-concat-stream@^1.6.2:
+concat-stream@^1.6.0, concat-stream@^1.6.2:
   version "1.6.2"
   resolved "https://registry.yarnpkg.com/concat-stream/-/concat-stream-1.6.2.tgz#904bdf194cd3122fc675c77fc4ac3d4ff0fd1a34"
   dependencies:
@@ -122,6 +131,10 @@ cookie@0.3.1:
 core-util-is@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
+
+crypto-js@3.1.6:
+  version "3.1.6"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-3.1.6.tgz#6142651b232dbb8ebdfa9716a70a2888359da6c9"
 
 debug@2.6.9:
   version "2.6.9"
@@ -429,7 +442,7 @@ minimatch@^3.0.4:
   dependencies:
     brace-expansion "^1.1.7"
 
-minimist@^1.1.0, minimist@^1.2.0:
+minimist@1.2.0, minimist@^1.1.0, minimist@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.0.tgz#a35008b20f41383eec1fb914f4cd5df79a264284"
 
@@ -484,6 +497,15 @@ mpromise@0.5.5:
   version "0.5.5"
   resolved "https://registry.yarnpkg.com/mpromise/-/mpromise-0.5.5.tgz#f5b24259d763acc2257b0a0c8c6d866fd51732e6"
 
+mqtt-packet@^5.4.0:
+  version "5.6.0"
+  resolved "https://registry.yarnpkg.com/mqtt-packet/-/mqtt-packet-5.6.0.tgz#923fb704d0ce0bd6ac81c7e1cc09469b1512d2fd"
+  dependencies:
+    bl "^1.2.1"
+    inherits "^2.0.3"
+    process-nextick-args "^2.0.0"
+    safe-buffer "^5.1.0"
+
 mqtt-packet@^5.5.0:
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/mqtt-packet/-/mqtt-packet-5.5.0.tgz#7f53244ba49fdecf795e950c14a9432dbf33bc63"
@@ -492,6 +514,24 @@ mqtt-packet@^5.5.0:
     inherits "^2.0.3"
     process-nextick-args "^2.0.0"
     safe-buffer "^5.1.0"
+
+mqtt@2.15.1:
+  version "2.15.1"
+  resolved "https://registry.yarnpkg.com/mqtt/-/mqtt-2.15.1.tgz#86fc34e387495df60cd0ccb75cd97743344a4b28"
+  dependencies:
+    commist "^1.0.0"
+    concat-stream "^1.6.0"
+    end-of-stream "^1.1.0"
+    help-me "^1.0.1"
+    inherits "^2.0.3"
+    minimist "^1.2.0"
+    mqtt-packet "^5.4.0"
+    pump "^2.0.0"
+    readable-stream "^2.3.3"
+    reinterval "^1.1.0"
+    split2 "^2.1.1"
+    websocket-stream "^5.0.1"
+    xtend "^4.0.1"
 
 mqtt@^2.17.0:
   version "2.17.0"
@@ -815,7 +855,7 @@ vary@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
 
-websocket-stream@^5.1.2:
+websocket-stream@^5.0.1, websocket-stream@^5.1.2:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/websocket-stream/-/websocket-stream-5.1.2.tgz#1c31c627bcdf34f1a9bdacc9daa15bfa4816d9ad"
   dependencies:

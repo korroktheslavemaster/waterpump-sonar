@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-iot-device-sdk": "^2.2.1",
     "body-parser": "^1.18.1",
     "dotenv": "^5.0.1",
     "ejs": "^2.5.7",
